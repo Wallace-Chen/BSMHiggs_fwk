@@ -98,10 +98,17 @@ const float mu_threshold_=25.;
 const float ele_threshold_=30.; 
 const float jet_threshold_=20.; 
 
+#ifdef YEAR_2017
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
+const float CSVLooseWP = 0.5803;
+const float CSVMediumWP = 0.8838;
+const float CSVTightWP = 0.9693;
+#else
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
 const float CSVLooseWP = 0.5426;  // Updated to 80X Moriond17 Loose
 const float CSVMediumWP = 0.800;
 const float CSVTightWP = 0.935;
+#endif
 
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Hbbtagging#8_0_X
 // https://indico.cern.ch/event/543002/contributions/2205058/attachments/1295600/1932387/cv-doubleb-tagging-btv-approval.pdf (definition of WPs: slide 16)
@@ -109,11 +116,16 @@ const float DBLooseWP = 0.300;
 const float DBMediumWP = 0.600;
 const float DBTightWP = 0.900;
 
+#ifdef YEAR_2017
+const float DeepCSVLooseWP = 0.1522;
+const float DeepCSVMediumWP = 0.4941;
+const float DeepCSVTightWP = 0.8001;
+#else
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco#Data_MC_Scale_Factors
 const float DeepCSVLooseWP = 0.2219;
 const float DeepCSVMediumWP = 0.6324;
 const float DeepCSVTightWP = 0.8958;
-
+#endif
 int main(int argc, char* argv[])
 {
     //##################################################################################
@@ -196,7 +208,11 @@ int main(int argc, char* argv[])
 
     bool isMCBkg_runPDFQCDscale = (isMC_ZZ || isMC_WZ || isMC_VVV);
 
+#ifdef YEAR_2017
+    bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TTTO")  != string::npos);
+#elif
     bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TTJets")  != string::npos);
+#endif
     bool isMC_stop  = isMC && (string(url.Data()).find("TeV_SingleT")  != string::npos);
 
     bool isMC_WJets = isMC && ( (string(url.Data()).find("MC13TeV_WJets")  != string::npos) || (string(url.Data()).find("MC13TeV_W1Jets")  != string::npos) || (string(url.Data()).find("MC13TeV_W2Jets")  != string::npos) || (string(url.Data()).find("MC13TeV_W3Jets")  != string::npos) || (string(url.Data()).find("MC13TeV_W4Jets")  != string::npos) );
@@ -212,7 +228,8 @@ int main(int argc, char* argv[])
     
     bool isSignal = (isMC_Wh || isMC_Zh || isMC_VBF );
 
-    if (isSignal) printf("Signal url = %s\n",url.Data());
+//    if (isSignal) printf("Signal url = %s\n",url.Data());
+    printf("Signal url = %s\n",url.Data());
 
     //b-tagging: beff and leff must be derived from the MC sample using the discriminator vs flavor
     //the scale factors are taken as average numbers from the pT dependent curves see:
@@ -228,8 +245,13 @@ int main(int argc, char* argv[])
     {
       b_tagging_name = "CSVv2";
        
+#ifdef YEAR_2017
+      csv_file_path = std::string(std::getenv("CMSSW_BASE"))+
+                      "/src/UserCode/bsmhiggs_fwk/data/weights/CSVv2_94XSF_V2_B_F.csv";
+#else
       csv_file_path = std::string(std::getenv("CMSSW_BASE"))+
                       "/src/UserCode/bsmhiggs_fwk/data/weights/CSVv2_Moriond17_B_H.csv";
+#endif
        
       LooseWP = CSVLooseWP;
       MediumWP = CSVMediumWP;
@@ -237,9 +259,14 @@ int main(int argc, char* argv[])
     }
     if ( use_DeepCSV) {
       b_tagging_name = "DeepCSV";
-       
+     
+#ifdef YEAR_2017
+      csv_file_path = std::string(std::getenv("CMSSW_BASE"))+
+                      "/src/UserCode/bsmhiggs_fwk/data/weights/DeepCSV_94XSF_V3_B_F.csv";
+#else
       csv_file_path = std::string(std::getenv("CMSSW_BASE"))+
                       "/src/UserCode/bsmhiggs_fwk/data/weights/DeepCSV_Moriond17_B_H.csv";
+#endif  
        
       LooseWP = DeepCSVLooseWP;
       MediumWP = DeepCSVMediumWP;
@@ -259,11 +286,19 @@ int main(int argc, char* argv[])
     //gSystem->ExpandPathName(uncFile);
     cout << "Loading jet energy scale uncertainties from: " << jecDir << endl;
 
+#ifdef YEAR_2017
+    if     (dtag.Contains("2017B")) jecDir+="94X/Fall17_17Nov2017B_V32_DATA/Fall17_17Nov2017B_V32_";
+    else if(dtag.Contains("2017C")) jecDir+="94X/Fall17_17Nov2017C_V32_DATA/Fall17_17Nov2017C_V32_";
+    else if(dtag.Contains("2017D") || dtag.Contains("2017E")) jecDir+="94X/Fall17_17Nov2017DE_V32_DATA/Fall17_17Nov2017DE_V32_";
+    else if(dtag.Contains("2017F")) jecDir+="94X/Fall17_17Nov2017F_V32_DATA/Fall17_17Nov2017F_V32_";
+    if(isMC) {jecDir+="94X/Fall17_17Nov2017_V32_MC/Fall17_17Nov2017_V32_";}
+#else
     if     (dtag.Contains("2016B") || dtag.Contains("2016C") ||dtag.Contains("2016D")) jecDir+="Summer16_80X/Summer16_23Sep2016BCDV4_DATA/";
     else if(dtag.Contains("2016E") || dtag.Contains("2016F")) jecDir+="Summer16_80X/Summer16_23Sep2016EFV4_DATA/";
     else if(dtag.Contains("2016G")) jecDir+="Summer16_80X/Summer16_23Sep2016GV4_DATA/";
     else if(dtag.Contains("2016H")) jecDir+="Summer16_80X/Summer16_23Sep2016HV4_DATA/";
     if(isMC) {jecDir+="Summer16_80X/Summer16_23Sep2016V4_MC/";}
+#endif
 
     gSystem->ExpandPathName(jecDir);
     //    FactorizedJetCorrector *jesCor = NULL;
@@ -289,7 +324,7 @@ int main(int argc, char* argv[])
     
     for (int isrc = 0; isrc < nsrc; isrc++) {
       const char *name = srcnames[isrc];
-      JetCorrectorParameters *p = new JetCorrectorParameters((jecDir+"/"+pf+"_UncertaintySources_AK4PFchs.txt").Data(), name);
+      JetCorrectorParameters *p = new JetCorrectorParameters((jecDir+pf+"_UncertaintySources_AK4PFchs.txt").Data(), name);
       JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
       //      totalJESUnc->push_back(unc);
       totalJESUnc[isrc] = unc;
@@ -381,11 +416,12 @@ int main(int argc, char* argv[])
     TString dirname = runProcess.getParameter<std::string>("dirName");
 
 
-    
+#ifndef YEAR_2017    
     //Lepton scale corrections
     EnergyScaleCorrection_class eScaler_("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Moriond17_74x_pho");     
     eScaler_.doScale=true;
     eScaler_.doSmearings=true;
+#endif
 
     std::string bit_string_stat = "001";
     std::string bit_string_syst = "010";
@@ -731,12 +767,14 @@ int main(int argc, char* argv[])
     //Lepton scale factors
     LeptonEfficiencySF lepEff;
 
+#ifndef YEAR_2017 //Trigger SF is 0.991 according to https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations#E/gamma%20Trigger%20Recomendations
     // e TRG eff SF 2Dhisto
     TString eTRG_sf = runProcess.getParameter<std::string>("ele_trgSF");
     gSystem->ExpandPathName(eTRG_sf);
     TFile *E_TRG_SF_file = TFile::Open(eTRG_sf);
     TH2F*  E_TRG_SF_h1 = (TH2F*) E_TRG_SF_file->Get("Ele27_WPTight_Gsf");
     // TH2F* E_TRG_SF_h2 = (TH2F*) E_TRG_SF_file->Get("Ele25_eta2p1_WPTight_Gsf");   
+#endif    
     // e RECO eff SF 2Dhisto          
     TString eRECO_sf = runProcess.getParameter<std::string>("ele_recoSF"); 
     gSystem->ExpandPathName(eRECO_sf); 
@@ -752,34 +790,58 @@ int main(int argc, char* argv[])
     TString muTRG_sf = runProcess.getParameter<std::string>("mu_trgSF"); 
     gSystem->ExpandPathName(muTRG_sf);   
     TFile *MU_TRG_SF_file = TFile::Open(muTRG_sf);  
+#ifdef YEAR_2017
+    TH2F* MU_TRG_SF_h = (TH2F*) MU_TRG_SF_file->Get("IsoMu27_PtEtaBins/pt_abseta_ratio");
+#else
     TH2F* MU_TRG_SF_h = (TH2F*) MU_TRG_SF_file->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio");
+#endif
 
     TString muTRG_sf2 = runProcess.getParameter<std::string>("mu_trgSF2");  
     gSystem->ExpandPathName(muTRG_sf2);         
     TFile *MU_TRG_SF_file2 = TFile::Open(muTRG_sf2);
+#ifdef YEAR_2017
+    TH2F* MU_TRG_SF_h2 = (TH2F*) MU_TRG_SF_file2->Get("IsoMu27_PtEtaBins/pt_abseta_ratio"); 
+#else
     TH2F* MU_TRG_SF_h2 = (TH2F*) MU_TRG_SF_file2->Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"); 
+#endif
 
      // mu ID SFs
     TString muID_sf = runProcess.getParameter<std::string>("mu_idSF"); 
     gSystem->ExpandPathName(muID_sf);   
     TFile *MU_ID_SF_file = TFile::Open(muID_sf);  
+#ifdef YEAR_2017
+    TH2F* MU_ID_SF_h = (TH2F*) MU_ID_SF_file->Get("NUM_TightID_DEN_genTracks_pt_abseta");
+#else
     TH2F* MU_ID_SF_h = (TH2F*) MU_ID_SF_file->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+#endif
     
     TString muID_sf2 = runProcess.getParameter<std::string>("mu_idSF2");    
     gSystem->ExpandPathName(muID_sf2); 
     TFile *MU_ID_SF_file2 = TFile::Open(muID_sf2);  
-    TH2F* MU_ID_SF_h2 = (TH2F*) MU_ID_SF_file2->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");   
+#ifdef YEAR_2017
+    TH2F* MU_ID_SF_h2 = (TH2F*) MU_ID_SF_file->Get("NUM_TightID_DEN_genTracks_pt_abseta");
+#else
+    TH2F* MU_ID_SF_h2 = (TH2F*) MU_ID_SF_file->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+#endif
 
     // mu ISO SFs
     TString muISO_sf = runProcess.getParameter<std::string>("mu_isoSF"); 
     gSystem->ExpandPathName(muISO_sf);   
     TFile *MU_ISO_SF_file = TFile::Open(muISO_sf);  
+#ifdef YEAR_2017
+    TH2F* MU_ISO_SF_h = (TH2F*) MU_ISO_SF_file->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
+#else
     TH2F* MU_ISO_SF_h = (TH2F*) MU_ISO_SF_file->Get("TightISO_TightID_pt_eta/pt_abseta_ratio");
+#endif
 
     TString muISO_sf2 = runProcess.getParameter<std::string>("mu_isoSF2");        
     gSystem->ExpandPathName(muISO_sf2);       
     TFile *MU_ISO_SF_file2 = TFile::Open(muISO_sf2);   
-    TH2F* MU_ISO_SF_h2 = (TH2F*) MU_ISO_SF_file2->Get("TightISO_TightID_pt_eta/pt_abseta_ratio");     
+#ifdef YEAR_2017
+    TH2F* MU_ISO_SF_h2 = (TH2F*) MU_ISO_SF_file->Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta");
+#else
+    TH2F* MU_ISO_SF_h2 = (TH2F*) MU_ISO_SF_file->Get("TightISO_TightID_pt_eta/pt_abseta_ratio");
+#endif
 
     //####################################################################################################################
     //###########################################           MVAHandler         ###########################################
@@ -1024,9 +1086,15 @@ int main(int argc, char* argv[])
 	      elDiff -= ilep;    
 	      if(fabs(ilep.en_EtaSC) < 1.479) elDiff_forMET -= ilep*0.006;
 	      else elDiff_forMET -= ilep*0.015; 
-	      
+/*	      
 	      if (isMC) {
+#ifdef YEAR_2017
+    //https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaMiniAODV2#2017_MiniAOD_V2
+    double sigma= ilep.en_enSmearNrSigma;
+    //printf("Electron smear sigma on MC: %f",sigma);
+#else
 		double sigma= eScaler_.getSmearingSigma(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et,ilep.en_gainSeed,0,0);
+#endif
 		//Now smear the MC energy
 		TRandom3 *rgen_ = new TRandom3(0);
 		double smearValue = rgen_->Gaus(1, sigma) ;
@@ -1034,11 +1102,16 @@ int main(int argc, char* argv[])
 		//TLorentzVector p4        
 		ilep.SetPxPyPzE(ilep.Px()*smearValue, ilep.Py()*smearValue, ilep.Pz()*smearValue, ilep.E()*smearValue); 
 	      } else {
+#ifdef YEAR_2017
+    double scale_corr= ilep.en_enScaleValue;
+    //printf("Electron scale factor on Data: %f",scale_corr);
+#else
 		double scale_corr=eScaler_.ScaleCorrection(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et,ilep.en_gainSeed); 
+#endif
 		//TLorentzVector p4
 		ilep.SetPxPyPzE(ilep.Px()*scale_corr, ilep.Py()*scale_corr, ilep.Pz()*scale_corr, ilep.E()*scale_corr); 
 	      }
-
+*/
 	      elDiff += ilep;    
 	      if(fabs(ilep.en_EtaSC) < 1.479) elDiff_forMET += ilep*0.006;     
 	      else elDiff_forMET += ilep*0.015;   
@@ -1072,62 +1145,107 @@ int main(int argc, char* argv[])
 		double et = ilep.en_cor_en / cosh(fabs(ilep.en_EtaSC)); 
 
 		if(ivar==1) { //stat electron up
-		  double error_scale=0.0;
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//		  error_scale = ilep.en_enScaleStatUp/ilep.E()-1;
+      //printf("Electron stat up error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_stat);
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*(1.+error_scale), ilep.Py()*(1.+error_scale), ilep.Pz()*(1.+error_scale), ilep.E()*(1.+error_scale));   
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);
 		}if(ivar==2) { //stat electron down
-		  double error_scale=0.0;
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//		  error_scale = ilep.en_enScaleStatDown/ilep.E()-1;
+      //printf("Electron stat down error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_stat); 
+#endif
 		  
 		  ilep.SetPxPyPzE(ilep.Px()*(1.-error_scale), ilep.Py()*(1.-error_scale), ilep.Pz()*(1.-error_scale), ilep.E()*(1.-error_scale)); 
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);   
 		}if(ivar==3) { //systematic electron up
-		  double error_scale=0.0;
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//		  error_scale = ilep.en_enScaleSystUp/ilep.E()-1;
+      //printf("Electron sys up error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_syst);
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*(1.+error_scale), ilep.Py()*(1.+error_scale), ilep.Pz()*(1.+error_scale), ilep.E()*(1.+error_scale)); 
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);   
 		}if(ivar==4) { //systematic electron down
-		  double error_scale=0.0;
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//		  error_scale = ilep.en_enScaleSystDown/ilep.E()-1;
+      //printf("Electron stat down error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_syst);
+#endif
 		  
 		  ilep.SetPxPyPzE(ilep.Px()*(1.-error_scale), ilep.Py()*(1.-error_scale), ilep.Pz()*(1.-error_scale), ilep.E()*(1.-error_scale));
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep); 
 		}if(ivar==5) { //gain switch electron up
-		  double error_scale=0.0;
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//	    error_scale = ilep.en_enScaleGainUp/ilep.E()-1;
+      //printf("Electron gain up error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_gain);
+#endif
 		  
 		  ilep.SetPxPyPzE(ilep.Px()*(1.+error_scale), ilep.Py()*(1.+error_scale), ilep.Pz()*(1.+error_scale), ilep.E()*(1.+error_scale)); 
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep); 
 		}if(ivar==6) { //gain switch electron down
-		  double error_scale=0.0;  
+      double error_scale = 0.0;
+#ifdef YEAR_2017
+//		  error_scale = ilep.en_enScaleGainDown/ilep.E()-1;
+      //printf("Electron gain down error scale: %f",error_scale);
+#else
 		  error_scale = eScaler_.ScaleCorrectionUncertainty(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,bit_gain);      
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*(1.-error_scale), ilep.Py()*(1.-error_scale), ilep.Pz()*(1.-error_scale), ilep.E()*(1.-error_scale));   
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);  
 		}if(ivar==7) { //rho resolution Electron up
 		  double smearValue = 1.0;
+#ifdef YEAR_2017
+//      smearValue = ilep.en_enSigmaRhoUp/ilep.E();
+      //printf("Electron rho up smear value: %f",smearValue);
+#else
 		  double sigma=eScaler_.getSmearingSigma(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,1,0);
 		  TRandom3 *rgen_ = new TRandom3(0);
 		  smearValue = rgen_->Gaus(1, sigma) ;
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*smearValue, ilep.Py()*smearValue, ilep.Pz()*smearValue, ilep.E()*smearValue);
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);  
 		}if(ivar==8) { //rho resolution Electron down
 		  double smearValue = 1.0;       
+#ifdef YEAR_2017
+//      smearValue = ilep.en_enSigmaRhoDown/ilep.E();
+      //printf("Electron rho down smear value: %f",smearValue);
+#else
 		  double sigma=eScaler_.getSmearingSigma(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,-1,0);
 		  TRandom3 *rgen_ = new TRandom3(0);  
 		  smearValue = rgen_->Gaus(1, sigma) ;        
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*smearValue, ilep.Py()*smearValue, ilep.Pz()*smearValue, ilep.E()*smearValue);      
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);      
 		}if(ivar==9) { //phi resolution Electron down
 		  double smearValue = 1.0;        
+#ifdef YEAR_2017
+//      smearValue = ilep.en_enSigmaPhiDown/ilep.E();
+      //printf("Electron phi down smear value: %f",smearValue);
+#else
 		  double sigma=eScaler_.getSmearingSigma(phys.run,(fabs(ilep.en_EtaSC)<=1.447),ilep.en_R9, ilep.en_EtaSC, et, ilep.en_gainSeed,0,-1);
 		  TRandom3 *rgen_ = new TRandom3(0);  
 		  smearValue = rgen_->Gaus(1, sigma) ;    
+#endif
 
 		  ilep.SetPxPyPzE(ilep.Px()*smearValue, ilep.Py()*smearValue, ilep.Pz()*smearValue, ilep.E()*smearValue);        
 		  selLeptonsVar[eleVarNames[ivar]].push_back(ilep);      
@@ -1375,8 +1493,12 @@ int main(int argc, char* argv[])
 	if (abs(selLeptons[0].id)==11) {
 	  // TRG
 	  if(isMC) {
+#ifdef YEAR_2017
+      weight*=0.991; //https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations#E/gamma%20Trigger%20Recomendations
+#else
 	    weight*=getSFfrom2DHist(selLeptons[0].pt(), selLeptons[0].en_EtaSC, E_TRG_SF_h1);
-	  }
+#endif
+    }
 	    //	    weight *= getSFfrom2DHist(selLeptons[0].pt(), selLeptons[0].en_EtaSC, E_TRG_SF_h1);
 	  //weight *= getSFfrom2DHist(selLeptons[0].pt(), selLeptons[0].en_EtaSC, E_TRG_SF_h2);
 	  mon.fillHisto("lep_pt_raw","e",selLeptons[0].pt(),weight);   
@@ -2246,7 +2368,10 @@ int main(int argc, char* argv[])
     PU_Up_File->Close(); 
     PU_Down_File->Close(); 
 
-    E_TRG_SF_file->Close(); E_RECO_SF_file->Close(); 
+#ifndef YEAR_2017
+    E_TRG_SF_file->Close();
+#endif
+    E_RECO_SF_file->Close(); 
     E_TIGHTID_SF_file->Close();
     MU_TRG_SF_file->Close();
     

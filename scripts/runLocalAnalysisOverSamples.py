@@ -130,6 +130,7 @@ for proc in procList :
             if(xsec>0 and not isdata) :
                 for ibr in br :  xsec = xsec*ibr
             split=getByLabel(d,'split',1)
+            print "Running 133"
 
             ## submit or resubmit
             if(resubmit) :      
@@ -162,6 +163,7 @@ for proc in procList :
                         rsegment+=1 
 
             else :    
+                print "Running 165"
                 mydtag = dtag
                 mydtag = mydtag.replace("#","")
                 mydtag = mydtag.replace(" ","")
@@ -176,7 +178,8 @@ for proc in procList :
                 SCRIPT_DTag.writelines('cd $CMSSW_BASE/src/UserCode/bsmhiggs_fwk/; \n\n')
                 
             # Loop over files for given dtag name:
-                ntplpath = '/eos/cms/store/user/georgia/'+inputdir + '/*/crab_' + origdtag + '*/*/*/'
+#                ntplpath = '/eos/cms/store/user/georgia/'+inputdir + '/*/crab_' + origdtag + '*/*/*/'
+                ntplpath = '/eos/cms/store/user/' + who + '/'+inputdir + '/*/crab_' + origdtag + '*/*/*/'
                 # FileList = [file for file in glob.glob(ntplpath+'analysis_*.root')] 
                 
                 segment=0

@@ -923,6 +923,21 @@ mainNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
 
 	 ev.en_gainSeed[ev.en] = gainSeed;
 
+#ifdef YEAR_2017
+  ev.en_enSmearNrSigma[ev.en] = el.userFloat("energySmearNrSigma"); ev.en_enScaleValue[ev.en] = el.userFloat("energyScaleValue");
+  ev.en_enScaleStatUp[ev.en] = el.userFloat("energyScaleStatUp"); ev.en_enScaleStatDown[ev.en] = el.userFloat("energyScaleStatDown"); ev.en_enScaleSystUp[ev.en] = el.userFloat("energyScaleSystUp"); ev.en_enScaleSystDown[ev.en] = el.userFloat("energyScaleSystDown"); ev.en_enScaleGainUp[ev.en] = el.userFloat("energyScaleGainUp"); ev.en_enScaleGainDown[ev.en] = el.userFloat("energyScaleGainDown"); ev.en_enSigmaRhoUp[ev.en] = el.userFloat("energySigmaRhoUp"); ev.en_enSigmaRhoDown[ev.en] = el.userFloat("energySigmaRhoDown"); ev.en_enSigmaPhiDown[ev.en] = el.userFloat("energySigmaPhiDown");
+//  ev.en_enScaleUp[ev.en] = el.userFloat("energyScaleUp");ev.en_enScaleDown[ev.en] = el.userFloat("energyScaleDown");ev.en_enSigmaUp[ev.en] = el.userFloat("energySigmaUp");ev.en_enSigmaDown[ev.en] = el.userFloat("energySigmaDown");
+
+if(verbose_) {
+  printf("Electron energy=%f,energySmearNrSigma=%f,energyScaleValue=%f,\n\
+          energyScaleStatUp=%f,\n energyScaleStatDown=%f,\n energyScaleSystUp=%f,\n energyScaleSystDown=%f,\n energyScaleGainUp=%f,\n energyScaleGainDown=%f,\n energySigmaRhoUp=%f,\n energySigmaRhoDown=%f,\n energySigmaPhiDown=%f",
+//          energyScaleUp=%f,\n energyScaleDown=%f,\n energySigmaUp=%f,\n energySigmaDown=%f",
+          ev.en_en[ev.en],ev.en_enSmearNrSigma[ev.en],ev.en_enScaleValue[ev.en],
+          ev.en_enScaleStatUp[ev.en],ev.en_enScaleStatDown[ev.en],ev.en_enScaleSystUp[ev.en],ev.en_enScaleSystDown[ev.en],ev.en_enScaleGainUp[ev.en],ev.en_enScaleGainDown[ev.en],ev.en_enSigmaRhoUp[ev.en],ev.en_enSigmaRhoDown[ev.en],ev.en_enSigmaPhiDown[ev.en]
+//          ev.en_enScaleUp[ev.en],ev.en_enScaleDown[ev.en],ev.en_enSigmaUp[ev.en],ev.en_enSigmaDown[ev.en]
+  );
+  }
+#endif
 	 /*
 	 if(isMC_){
 	   double sigma= eScaler_.getSmearingSigma(event.eventAuxiliary().run(),el.isEB(),el.full5x5_r9(), el.superCluster()->eta(), el.et(),gainSeed,0,0);
@@ -1007,7 +1022,7 @@ mainNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
                 j.userFloat("pileupJetId:fullDiscriminant")
              ) ;
          }
-	 if(patUtils::passPFJetID("Loose", j))  ijet2++; 
+	 if(patUtils::passPFJetID("Loose", j))  ijet2++;
 
 	 ev.jet_mother_id[ev.jet] = 0;
 	 
@@ -1194,7 +1209,7 @@ mainNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
 	 ev.fjet++;
 	 ifjet++;
        }
-*/ 
+*/       
      pat::METCollection mets;
      edm::Handle< pat::METCollection > metsHandle;
      // if(isMC_)

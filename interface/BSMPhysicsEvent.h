@@ -12,6 +12,8 @@
 #include "UserCode/bsmhiggs_fwk/interface/DataEvtSummaryHandler.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+#define YEAR_2017
+
 enum PhysicsObjects   { MET=0,JET=1,TOP=6,ELECTRON=11, MUON=13, TAU=15, GLUON=21, PHOTON=22, Z=23, W=24};
 enum LeptonChannels { UNKNOWN=0,MUMU=1,MU=2,EE=3,E=4,EMU=5,ETAU=6,MUTAU=7, GAMMA=22};
 
@@ -100,7 +102,27 @@ public :
 	ta_IsMediumIso = ta_IsMediumIso_;
 	ta_IsTightIso = ta_IsTightIso_;
     }
-
+#ifdef YEAR_2017
+  void setLeptonScaleFac(float en_enSmearNrSigma_, float en_enScaleValue_,
+    float en_enScaleStatUp_, float en_enScaleStatDown_, float en_enScaleSystUp_, float en_enScaleSystDown_, float en_enScaleGainUp_, float en_enScaleGainDown_, float en_enSigmaRhoUp_,  float en_enSigmaRhoDown_, float en_enSigmaPhiDown_) {
+//    float en_enScaleUp_, float en_enScaleDown_, float en_enSigmaUp_, float en_enSigmaDown_) {
+    en_enSmearNrSigma = en_enSmearNrSigma_;
+    en_enScaleValue   = en_enScaleValue_;
+    en_enScaleStatUp  = en_enScaleStatUp_;
+    en_enScaleStatDown= en_enScaleStatDown_;
+    en_enScaleSystUp  = en_enScaleSystUp_;
+    en_enScaleSystDown= en_enScaleSystDown_;
+    en_enScaleGainUp  = en_enScaleGainUp_;
+    en_enScaleGainDown= en_enScaleGainDown_;
+    en_enSigmaRhoUp   = en_enSigmaRhoUp_;
+    en_enSigmaRhoDown = en_enSigmaRhoDown_;
+    en_enSigmaPhiDown = en_enSigmaPhiDown_;
+//    en_enScaleUp      = en_enScaleUp_;
+//    en_enScaleDown    = en_enScaleDown_;
+//    en_enSigmaUp      = en_enSigmaUp_;
+//    en_enSigmaDown    = en_enSigmaDown_;
+  }
+#endif
     float e_pfRelIsoDbeta() {
         return (en_chargedIso + TMath::Max(0., en_neutralHadIso + en_photonIso - 0.5 * en_pileupIso) )/pt();
     }
@@ -131,6 +153,12 @@ public :
     float en_pileupIso, en_chargedIso, en_photonIso, en_neutralHadIso;
     float en_relIsoWithEA;
     bool ta_IsLooseIso, ta_IsMediumIso, ta_IsTightIso;
+
+#ifdef YEAR_2017
+    float en_enSmearNrSigma, en_enScaleValue;
+    float en_enScaleStatUp, en_enScaleStatDown, en_enScaleSystUp, en_enScaleSystDown, en_enScaleGainUp, en_enScaleGainDown, en_enSigmaRhoUp,  en_enSigmaRhoDown, en_enSigmaPhiDown;
+    float en_enScaleUp, en_enScaleDown, en_enSigmaUp, en_enSigmaDown;
+#endif
 };
 
 

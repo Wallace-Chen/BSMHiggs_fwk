@@ -29,6 +29,8 @@ const Int_t MAXSB = 2;
 #define MAXMCPARTICLES 250
 #define MAXLHEWEIGHTS 500
 
+#define YEAR_2017
+
 struct DataEvtSummary_t {
 
     Int_t run,lumi;
@@ -115,6 +117,11 @@ struct DataEvtSummary_t {
     Bool_t en_passId[MAXPARTICLES],en_passIdLoose[MAXPARTICLES],en_passIso[MAXPARTICLES];
     Float_t en_relIso[MAXPARTICLES];
 
+#ifdef YEAR_2017
+    Float_t en_enSmearNrSigma[MAXPARTICLES],en_enScaleValue[MAXPARTICLES];
+    Float_t en_enScaleStatUp[MAXPARTICLES],en_enScaleStatDown[MAXPARTICLES],en_enScaleSystUp[MAXPARTICLES],en_enScaleSystDown[MAXPARTICLES],en_enScaleGainUp[MAXPARTICLES],en_enScaleGainDown[MAXPARTICLES],en_enSigmaRhoUp[MAXPARTICLES],en_enSigmaRhoDown[MAXPARTICLES],en_enSigmaPhiDown[MAXPARTICLES];
+    Float_t en_enScaleUp[MAXPARTICLES],en_enScaleDown[MAXPARTICLES],en_enSigmaUp[MAXPARTICLES],en_enSigmaDown[MAXPARTICLES];
+#endif
     //tau
     Int_t ta;
     Float_t ta_px[MAXPARTICLES],ta_py[MAXPARTICLES],ta_pz[MAXPARTICLES],ta_en[MAXPARTICLES];

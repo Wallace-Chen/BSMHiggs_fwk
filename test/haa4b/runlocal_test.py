@@ -11,7 +11,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 5
 
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("Configuration.EventContent.EventContent_cff")
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 #load run conditions
 #process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -93,8 +93,8 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-			fileName = cms.string("analysis_MC_r.root")
-#			fileName = cms.string("analysis_Data.root")
+#			fileName = cms.string("analysis_MC_2J_woFJ.root")
+			fileName = cms.string("analysis_MC.root")
 )
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer")  

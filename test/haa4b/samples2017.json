@@ -288,6 +288,50 @@
             "tag": "Single Top"
         },
         {
+            "color": 833,
+            "data": [
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [ 
+		                    "/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTTo2L2Nu_powheg_2017",
+                    "xsec": 88.29
+                },
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [
+                       "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTToSemiLeptonic_powheg_2017",
+                    "xsec": 365.34
+                },
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [
+                       "/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTToHadronic_powheg_2017",
+                    "xsec": 377.96
+                }
+            ],
+            "isdata": false,
+            "keys": [
+	             "haa_mcbased"	
+            ],
+            "mctruthmode": 5,
+            "tag": "t#bar{t} + b#bar{b}"
+        }, 	    
+        {
             "color": 408,
             "data": [
                 {
@@ -328,7 +372,52 @@
             "keys": [
 	             "haa_mcbased"	
             ],
-            "tag": "t#bar{t}"
+            "mctruthmode": 4,
+            "tag": "t#bar{t} + c#bar{c}"
+        }, 	    
+        {
+            "color": 406,
+            "data": [
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [ 
+		                    "/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTTo2L2Nu_powheg_2017",
+                    "xsec": 88.29
+                },
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [
+                       "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTToSemiLeptonic_powheg_2017",
+                    "xsec": 365.34
+                },
+                {
+                    "br": [
+                       1.0
+                     ],
+                    "dset": [
+                       "/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"
+                     ],
+                    "gtag": "94X_mc2017_realistic_v14",
+                    "dtag": "MC13TeV_TTToHadronic_powheg_2017",
+                    "xsec": 377.96
+                }
+            ],
+            "isdata": false,
+            "keys": [
+	             "haa_mcbased"	
+            ],
+            "mctruthmode": 1,
+            "tag": "t#bar{t} + light"
         }, 	    
         {
             "color": 17,
