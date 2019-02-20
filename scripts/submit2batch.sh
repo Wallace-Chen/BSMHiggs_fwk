@@ -52,8 +52,8 @@ fi
 # CONFIGURE
 #
 if [[ -z $QUEUE ]]; then
-#    QUEUE="1nd"
-    QUEUE="8nh"
+    QUEUE="1nd"
+#    QUEUE="8nh"
 #    QUEUE="2nd"
 fi
 
@@ -66,7 +66,8 @@ fi
 echo -e "\e[0;35m Submitting shell script: bsub -q $QUEUE -o $LOG -R $REQUIREMENT -J $JOBNAME `echo ${SCRIPT} ${PARAMS}` \e[0m"
 ######
 #bsub -sp 99 -q $QUEUE -o $LOG -R "$REQUIREMENT" -J $JOBNAME `echo ${SCRIPT} ${PARAMS}`
-bsub -sp 100 -q $QUEUE -o $LOG -J $JOBNAME `echo ${SCRIPT} ${PARAMS}`
+#bsub -sp 100 -q $QUEUE -o $LOG -J $JOBNAME `echo ${SCRIPT} ${PARAMS}`
+`${SCRIPT} ${PARAMS}`
 ######
 #
 # END

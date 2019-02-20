@@ -21,6 +21,8 @@
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="RecoBTag/SecondaryVertex"/>
 
+<use name="CondFormats/BTauObjects"/>
+<use name="CondTools/BTau"/>
 <environment>
 <!-- Common tools and examples -->
   <bin name="extractLumiJSON"             file="common/extractLumiJSON.cc"></bin>

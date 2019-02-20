@@ -1,3 +1,4 @@
+#define YEAR_2017
 #include <iostream>
 #include <map>
 
@@ -16,7 +17,12 @@
 #include "UserCode/bsmhiggs_fwk/interface/rochcor2016.h" 
 #include "UserCode/bsmhiggs_fwk/interface/muresolution_run2.h" 
 #include "UserCode/bsmhiggs_fwk/interface/LeptonEfficiencySF.h"
+#ifdef YEAR_2017
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#else
 #include "UserCode/bsmhiggs_fwk/interface/BTagCalibrationStandalone.h"
+#endif
 #include "UserCode/bsmhiggs_fwk/interface/BtagUncertaintyComputer.h"
 #include "UserCode/bsmhiggs_fwk/interface/METUtils.h"
 //#include "UserCode/bsmhiggs_fwk/interface/BTagUtils.h"
@@ -40,7 +46,6 @@
 #include "TROOT.h"
 #include "TMath.h"
 
-#define YEAR_2017
 #ifdef  YEAR_2017
 #define getSmearingSigma(a,b,c,d,e,f,g,h) getSmearingSigma(a,b,c,d,e,g,h)
 #define ScaleCorrection(a,b,c,d,e,f) ScaleCorrection(a,b,c,d,e)
@@ -178,9 +183,11 @@ int main(int argc, char* argv[])
     // }
     TString outdir = runProcess.getParameter<std::string>("outdir");
     TString outUrl( outdir );
+    TString outTxtUrl = outUrl + "/TXT";
     gSystem->Exec("mkdir -p " + outUrl);
+    gSystem->Exec("mkdir -p " + outTxtUrl);
   
-    TString outTxtUrl_final= outUrl + "/" + outFileUrl + "_FinalList.txt";
+    TString outTxtUrl_final= outTxtUrl + "/" + outFileUrl + "_FinalList.txt";
     FILE* outTxtFile_final = NULL;
     outTxtFile_final = fopen(outTxtUrl_final.Data(), "w");
     printf("TextFile URL = %s\n",outTxtUrl_final.Data());
@@ -209,7 +216,7 @@ int main(int argc, char* argv[])
     bool isMCBkg_runPDFQCDscale = (isMC_ZZ || isMC_WZ || isMC_VVV);
 
 #ifdef YEAR_2017
-    bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TTTO")  != string::npos);
+    bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TTTo")  != string::npos);
 #elif
     bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TTJets")  != string::npos);
 #endif
@@ -274,11 +281,19 @@ int main(int argc, char* argv[])
     }
     
     BTagCalibration btagCalib(b_tagging_name, csv_file_path);
+//set up BTagCalibration https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration
+#ifdef YEAR_2017
+    BTagCalibrationReader reader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
+    reader.load(btagCalib, BTagEntry::FLAV_B, "comb");
+    reader.load(btagCalib, BTagEntry::FLAV_C, "comb");
+    reader.load(btagCalib, BTagEntry::FLAV_UDSG, "incl");
+#else
     // setup calibration readers 80X
     BTagCalibrationReader80X btagCal80X(BTagEntry::OP_LOOSE, "central", {"up", "down"});
     btagCal80X.load(btagCalib, BTagEntry::FLAV_B, "comb");
     btagCal80X.load(btagCalib, BTagEntry::FLAV_C, "comb");
     btagCal80X.load(btagCalib, BTagEntry::FLAV_UDSG, "incl");
+#endif
 
 
     //jet energy scale uncertainties
@@ -911,14 +926,14 @@ int main(int argc, char* argv[])
         if(isMC) 
         {
           weight *= genWeight;
-          //Here is the tricky part.,... rewrite xsecWeight for WJets/WXJets and DYJets/DYXJets
+          //Here is the tricky part.,... oewrite xsecWeight for WJets/WXJets and DYJets/DYXJets
           if( isMC_WJets )
 	    { xsecWeight = xsecWeightCalculator::xsecWeightCalcLHEJets(0, ev.lheNJets); }
           else if( isMC_DY ) {
 	    if (string(url.Data()).find("10to50")  != string::npos)
-	      { xsecWeight = xsecWeightCalculator::xsecWeightCalcLHEJets(1, ev.lheNJets); }
+	      { xsecWeight = xsecWeightCalculator::xsecWeightCalcLHEJets(1, ev.lheNJets); }//std::cout << "10to50, NJets: " << ev.lheNJets << ", xsec weight: " << xsecWeight << std::endl;}
             else
-	      { xsecWeight = xsecWeightCalculator::xsecWeightCalcLHEJets(2, ev.lheNJets); }
+	      { xsecWeight = xsecWeightCalculator::xsecWeightCalcLHEJets(2, ev.lheNJets); } //std::cout << "M50, NJets: " << ev.lheNJets << ", xsec weight: " << xsecWeight << std::endl;}
           }
           weight *= xsecWeight; 
         }
@@ -1849,41 +1864,86 @@ int main(int argc, char* argv[])
 		  if(use_DeepCSV) beff=btsfutil.getBTagEff(vJets[ijet].pt(),"bLOOSE");   
 		  //  80X recommendation
 		  if (varNames[ivar]=="_btagup") {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtagUp  , reader.eval_auto_bounds("up", BTagEntry::FLAV_B ,
+											  vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagUp;
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtagUp  , btagCal80X.eval_auto_bounds("up", BTagEntry::FLAV_B ,
 											  vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagUp;
-		  } else if ( varNames[ivar]=="_btagdown") {
+#endif
+      } else if ( varNames[ivar]=="_btagdown") {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtagDown, reader.eval_auto_bounds("down", BTagEntry::FLAV_B ,
+											  vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagDown;
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtagDown, btagCal80X.eval_auto_bounds("down", BTagEntry::FLAV_B ,
 											  vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagDown;
-		  } else {
+#endif
+      } else {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtag , reader.eval_auto_bounds("central", BTagEntry::FLAV_B ,
+										       vJets[ijet].eta(), vJets[ijet].pt()), beff); 
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtag , btagCal80X.eval_auto_bounds("central", BTagEntry::FLAV_B ,
 										       vJets[ijet].eta(), vJets[ijet].pt()), beff); 
-		  }
+#endif		  
+      }
 		} else if(abs(vJets[ijet].flavid)==4) {
 		  if(use_DeepCSV) beff=btsfutil.getBTagEff(vJets[ijet].pt(),"cLOOSE");      
 		  //  80X recommendation
 		   if (varNames[ivar]=="_ctagup") {
+#ifdef YEAR_2017
+		     btsfutil.modifyBTagsWithSF(hasCSVtagUp  , reader.eval_auto_bounds("up", BTagEntry::FLAV_C , 
+											   vJets[ijet].eta(), vJets[ijet].pt()), beff);hasCSVtag=hasCSVtagUp;
+#else
 		     btsfutil.modifyBTagsWithSF(hasCSVtagUp  , btagCal80X.eval_auto_bounds("up", BTagEntry::FLAV_C , 
 											   vJets[ijet].eta(), vJets[ijet].pt()), beff);hasCSVtag=hasCSVtagUp;
-		   } else if ( varNames[ivar]=="_ctagdown") {
+#endif		   
+       } else if ( varNames[ivar]=="_ctagdown") {
+#ifdef YEAR_2017
+		     btsfutil.modifyBTagsWithSF(hasCSVtagDown, reader.eval_auto_bounds("down", BTagEntry::FLAV_C , 
+		  								      vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagDown;
+#else
 		     btsfutil.modifyBTagsWithSF(hasCSVtagDown, btagCal80X.eval_auto_bounds("down", BTagEntry::FLAV_C , 
 		  								      vJets[ijet].eta(), vJets[ijet].pt()), beff); hasCSVtag=hasCSVtagDown;
-		   } else {
+#endif
+       } else {
+#ifdef YEAR_2017
+		      btsfutil.modifyBTagsWithSF(hasCSVtag , reader.eval_auto_bounds("central", BTagEntry::FLAV_C ,
+										     vJets[ijet].eta(), vJets[ijet].pt()), beff);
+#else
 		      btsfutil.modifyBTagsWithSF(hasCSVtag , btagCal80X.eval_auto_bounds("central", BTagEntry::FLAV_C ,
 										     vJets[ijet].eta(), vJets[ijet].pt()), beff);
-		   }
+#endif		   
+       }
 		} else {
 		  if(use_DeepCSV) leff=btsfutil.getBTagEff(vJets[ijet].pt(),"lLOOSE");      
 		  //  80X recommendation
 		  if (varNames[ivar]=="_ltagup") {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtagUp  , reader.eval_auto_bounds("up", BTagEntry::FLAV_UDSG   , 
+		  								      vJets[ijet].eta(), vJets[ijet].pt()), leff);hasCSVtag=hasCSVtagUp;
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtagUp  , btagCal80X.eval_auto_bounds("up", BTagEntry::FLAV_UDSG   , 
 		  								      vJets[ijet].eta(), vJets[ijet].pt()), leff);hasCSVtag=hasCSVtagUp;
-		  } else if ( varNames[ivar]=="_ltagdown") {
+#endif
+      } else if ( varNames[ivar]=="_ltagdown") {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtagDown, reader.eval_auto_bounds("down", BTagEntry::FLAV_UDSG   , 
+		  								      vJets[ijet].eta(), vJets[ijet].pt()), leff);hasCSVtag=hasCSVtagDown;
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtagDown, btagCal80X.eval_auto_bounds("down", BTagEntry::FLAV_UDSG   , 
 		  								      vJets[ijet].eta(), vJets[ijet].pt()), leff);hasCSVtag=hasCSVtagDown;
-		  } else {
+#endif
+      } else {
+#ifdef YEAR_2017
+		    btsfutil.modifyBTagsWithSF(hasCSVtag , reader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG ,
+										       vJets[ijet].eta(), vJets[ijet].pt()), leff);
+#else
 		    btsfutil.modifyBTagsWithSF(hasCSVtag , btagCal80X.eval_auto_bounds("central", BTagEntry::FLAV_UDSG ,
 										       vJets[ijet].eta(), vJets[ijet].pt()), leff);
-		  }
+#endif		  
+      }
 		}
 		
 	      } // isMC
