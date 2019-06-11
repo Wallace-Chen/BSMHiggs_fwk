@@ -41,7 +41,7 @@
 #include "TMath.h"
 
 #include <unistd.h>
-//#define YEAR_2017
+#define YEAR_2017
 using namespace std;
 
 
@@ -910,8 +910,12 @@ int main(int argc, char* argv[])
       btagfile = TFile::Open(btagfilename);
       if(btagfile->IsZombie() || !btagfile->IsOpen()) {std::cout<<"Error, cannot open file: "<<btagfilename<<std::endl;return -1;}
       btagEff_b = (TH2F *)btagfile->Get("Loose_efficiency_b");
+      btagEff_b->SetDirectory(0); // to decouple it from the open file direcotry
       btagEff_c = (TH2F *)btagfile->Get("Loose_efficiency_c");
+      btagEff_c->SetDirectory(0);
       btagEff_udsg = (TH2F *)btagfile->Get("Loose_efficiency_udsg");
+      btagEff_udsg->SetDirectory(0);
+      btagfile->Close();
     }
     
     
@@ -2537,7 +2541,7 @@ int main(int argc, char* argv[])
     E_TIGHTID_SF_file->Close();
     MU_TRG_SF_file->Close();
     
-    btagfile->Close();
+//    btagfile->Close();
 
     printf("\n");
     file->Close();

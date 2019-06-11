@@ -85,18 +85,19 @@ def produceEfficiencyMaps(binxX, binsY, inputPath, outputPath, useDeepCSV):
 
 try:
      # retrive command line options
-    shortopts  = "s:e:j:d:o:c:l:p:t:g:r:?" #RJ
+    shortopts  = "s:e:j:d:o:c:l:p:t:g:r:f:?" #RJ
     opts, args = getopt.getopt( sys.argv[1:], shortopts )
 except getopt.GetoptError:
     # print help information and exit:
     print "ERROR: unknown options in argument %s" % sys.argv[1:]
-    usage()
+#    usage()
     sys.exit(1)
 
 samplesDB=''
 inputdir=''
 outdir=''
 onlytag='all'
+force=True
 useDeepCSV=True
 
 DtagsList = []
@@ -108,11 +109,13 @@ for o,a in opts:
     elif o in('-o'): outdir = a
     elif o in('-t'): onlytag = a
     elif o in('-u'): useDeepCSV = a
+    elif o in('-f'): force = a
 
 jsonFile = open(samplesDB,'r')
 procList=json.load(jsonFile,encoding='utf-8').items()
 
 print "Only files with dtags matching " + onlytag + " are processed."
+print "Force option is: " + force
 #run over sample
 for proc in procList :
     #run over processes
@@ -136,6 +139,9 @@ for proc in procList :
 
             outfile = outdir +'/'+ dtag + '_' + 'BTaggNums.root'
             destfile = outdir +'/'+ dtag + '_' + 'BTaggEff.root'
+            if force=="False" and os.path.isfile(destfile):
+              print "Output file already exists: " + destfile
+              continue
             ntplpath = '/eos/cms/store/user/' + who + '/'+inputdir + '/*/crab_' + origdtag + '*/*/*/'
             status, output = commands.getstatusoutput('ls '+ntplpath+'analysis_*.root')
             if status > 0 :

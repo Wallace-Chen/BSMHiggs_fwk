@@ -376,10 +376,10 @@ for procBlock in procList :
                           else: LaunchOnCondor.Jobs_CRABStorageSite = 'T2_CH_CERN'
                           if(isdata): 
                               LaunchOnCondor.Jobs_CRABsplitting = 'LumiBased'
-                              LaunchOnCondor.Jobs_CRABUnitPerJob = 300 
+                              LaunchOnCondor.Jobs_CRABUnitPerJob = 250 
                           else: 
                               LaunchOnCondor.Jobs_CRABsplitting = 'FileBased'
-                              LaunchOnCondor.Jobs_CRABUnitPerJob = 15
+                              LaunchOnCondor.Jobs_CRABUnitPerJob = 8
                           LaunchOnCondor.Jobs_CRABname     = dtag + '_' + str(s)
                           if( 'signal' in opt.onlykeyword):
                             LaunchOnCondor.Jobs_CRABInDBS    = getByLabel(procData,'dbsURL','phys03')
